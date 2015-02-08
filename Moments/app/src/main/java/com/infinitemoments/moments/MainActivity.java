@@ -10,6 +10,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.os.Build;
+import android.widget.TextView;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -52,6 +56,8 @@ public class MainActivity extends ActionBarActivity {
      * A placeholder fragment containing a simple view.
      */
     public static class PlaceholderFragment extends Fragment {
+        @InjectView(R.id.txtHello)
+        TextView textHello;
 
         public PlaceholderFragment() {
         }
@@ -60,6 +66,9 @@ public class MainActivity extends ActionBarActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+            ButterKnife.inject(this, rootView);
+
+            textHello.setText("Butterknife works!");
             return rootView;
         }
     }
