@@ -25,9 +25,11 @@ import java.util.Arrays;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
 
 public class SignupFragment extends Fragment {
-    LoginSignupListener mCallback;
     @InjectView(R.id.edtEmail)
     EditText email;
     @InjectView(R.id.edtPassword)
@@ -39,8 +41,11 @@ public class SignupFragment extends Fragment {
     @InjectView(R.id.authButton)
     LoginButton authButton;
 
+    private LoginSignupListener mCallback;
     private UiLifecycleHelper uiHelper;
     private GraphUser facebookUser;
+    private RestAdapter restAdapter;
+    private HeisenbergProxy proxy;
     private static final String TAG = "SignupFragment";
 
     private Session.StatusCallback callback = new Session.StatusCallback() {
@@ -64,6 +69,10 @@ public class SignupFragment extends Fragment {
         super.onCreate(savedInstanceState);
         uiHelper = new UiLifecycleHelper(getActivity(), callback);
         uiHelper.onCreate(savedInstanceState);
+        restAdapter = new RestAdapter.Builder()
+                .setEndpoint(Constants.API_URL)
+                .build();
+        proxy = restAdapter.create(HeisenbergProxy.class);
     }
 
     @Override
@@ -113,6 +122,12 @@ public class SignupFragment extends Fragment {
 
         if (password.getText().toString().equals(verifyPassword.getText().toString())){
             // Proceed to complete sign up
+            User user = new User();
+            user.email = email.getText().toString();
+            user.password = password.getText().toString();
+            user.name = facebookUser.getName();
+
+            postUserToServer(user);
         } else {
             // Passwords don't match
             Toast.makeText(this.getActivity(), "Passwords don't match, enter again!", Toast.LENGTH_SHORT).show();
@@ -121,6 +136,26 @@ public class SignupFragment extends Fragment {
             verifyPassword.setText("");
         }
 
+    }
+
+    private void postUserToServer(User user){
+        proxy.postUser(user.email, user.password, user.name, new Callback<User>() {
+            @Override
+            public void success(User user, retrofit.client.Response response) {
+                Log.v(TAG, "Sign up successful!");
+                Log.v(TAG, "Raw response: " + response.toString());
+            }
+
+            @Override
+            public void failure(final RetrofitError error) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
     }
 
     private void onSessionStateChange(Session session, SessionState state, Exception exception) {
@@ -142,7 +177,6 @@ public class SignupFragment extends Fragment {
                         // Populate text fields
                         email.setText(String.valueOf(user.getProperty("email")));
                     }
-
                 }
             });
             //Execute the request
