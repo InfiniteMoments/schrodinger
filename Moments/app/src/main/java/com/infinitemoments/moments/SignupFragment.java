@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.facebook.Request;
 import com.facebook.Response;
@@ -23,6 +24,7 @@ import java.util.Arrays;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnClick;
 
 public class SignupFragment extends Fragment {
     LoginSignupListener mCallback;
@@ -93,6 +95,32 @@ public class SignupFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mCallback = null;
+    }
+
+    @OnClick (R.id.btnCompleteSignUp)
+    public void onCompleteSignup(){
+        if (email.getText() == null || email.getText().toString().trim().equals("")){
+            Toast.makeText(this.getActivity(), "Enter an email in the email field", Toast.LENGTH_SHORT).show();
+        }
+
+        if (password.getText() == null || password.getText().toString().trim().equals("")){
+            Toast.makeText(this.getActivity(), "Enter a password in the password field", Toast.LENGTH_SHORT).show();
+        }
+
+        if (verifyPassword.getText() == null || verifyPassword.getText().toString().trim().equals("")){
+            Toast.makeText(this.getActivity(), "Enter a password in the verify password field", Toast.LENGTH_SHORT).show();
+        }
+
+        if (password.getText().toString().equals(verifyPassword.getText().toString())){
+            // Proceed to complete sign up
+        } else {
+            // Passwords don't match
+            Toast.makeText(this.getActivity(), "Passwords don't match, enter again!", Toast.LENGTH_SHORT).show();
+
+            password.setText("");
+            verifyPassword.setText("");
+        }
+
     }
 
     private void onSessionStateChange(Session session, SessionState state, Exception exception) {
