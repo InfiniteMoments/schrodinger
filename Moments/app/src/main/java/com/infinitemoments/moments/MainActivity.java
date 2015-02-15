@@ -6,7 +6,11 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import io.realm.Realm;
+
 public class MainActivity extends ActionBarActivity implements LoginSignupListener {
+    private Realm realm;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,6 +60,35 @@ public class MainActivity extends ActionBarActivity implements LoginSignupListen
 
         // Commit the transaction
         transaction.commit();
+    }
+
+    @Override
+    public void storeLoggedInUser(User user) {
+        // Open the default realm ones for the UI thread.
+        realm = Realm.getInstance(this);
+
+        UserObject loggedInUser = realm.where(UserObject.class).findFirst();
+
+        if (loggedInUser == null){
+            // All writes must be wrapped in a transaction to facilitate safe multi threading
+            realm.beginTransaction();
+
+            // No existing users stored, create new object
+            UserObject storedUser = realm.createObject(UserObject.class);
+            storedUser.setId(user.id);
+            storedUser.setName(user.name);
+            storedUser.setEmail(user.email);
+            storedUser.setToken(user.token);
+            realm.commitTransaction();
+        } else {
+            // Found an existing user object, update it
+            realm.beginTransaction();
+            loggedInUser.setId(user.id);
+            loggedInUser.setName(user.name);
+            loggedInUser.setEmail(user.email);
+            loggedInUser.setToken(user.token);
+            realm.commitTransaction();
+        }
     }
 
     @Override

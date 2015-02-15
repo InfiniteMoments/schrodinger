@@ -28,10 +28,14 @@ import butterknife.OnClick;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
+import retrofit.android.AndroidLog;
+import retrofit.mime.TypedByteArray;
 
 public class SignupFragment extends Fragment {
     @InjectView(R.id.edtEmail)
     EditText email;
+    @InjectView(R.id.edtUsername)
+    EditText username;
     @InjectView(R.id.edtPassword)
     EditText password;
     @InjectView(R.id.edtVerifyPassword)
@@ -71,6 +75,8 @@ public class SignupFragment extends Fragment {
         uiHelper.onCreate(savedInstanceState);
         restAdapter = new RestAdapter.Builder()
                 .setEndpoint(Constants.API_URL)
+                .setLogLevel(RestAdapter.LogLevel.FULL)
+                .setLog(new AndroidLog("xx--LOG--xx"))
                 .build();
         proxy = restAdapter.create(HeisenbergProxy.class);
     }
@@ -112,6 +118,10 @@ public class SignupFragment extends Fragment {
             Toast.makeText(this.getActivity(), "Enter an email in the email field", Toast.LENGTH_SHORT).show();
         }
 
+        if (username.getText() == null || username.getText().toString().trim().equals("")){
+            Toast.makeText(this.getActivity(), "Create a username for your account", Toast.LENGTH_SHORT).show();
+        }
+
         if (password.getText() == null || password.getText().toString().trim().equals("")){
             Toast.makeText(this.getActivity(), "Enter a password in the password field", Toast.LENGTH_SHORT).show();
         }
@@ -124,10 +134,10 @@ public class SignupFragment extends Fragment {
             // Proceed to complete sign up
             User user = new User();
             user.email = email.getText().toString();
-            user.password = password.getText().toString();
             user.name = facebookUser.getName();
+            user.username = username.getText().toString();
 
-            postUserToServer(user);
+            postUserToServer(user, password.getText().toString());
         } else {
             // Passwords don't match
             Toast.makeText(this.getActivity(), "Passwords don't match, enter again!", Toast.LENGTH_SHORT).show();
@@ -138,20 +148,24 @@ public class SignupFragment extends Fragment {
 
     }
 
-    private void postUserToServer(User user){
-        proxy.postUser(user.email, user.password, user.name, new Callback<User>() {
+    private void postUserToServer(User user, String password){
+        proxy.postUser(user.email, user.username, password, user.name, new Callback<User>() {
             @Override
             public void success(User user, retrofit.client.Response response) {
                 Log.v(TAG, "Sign up successful!");
                 Log.v(TAG, "Raw response: " + response.toString());
+
+                // Save the User object locally and login
             }
 
             @Override
             public void failure(final RetrofitError error) {
+                final String json =  new String(((TypedByteArray)error.getResponse().getBody()).getBytes());
+                Log.v("failure", json.toString());
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(getActivity(), error.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getActivity(), json, Toast.LENGTH_SHORT).show();
                     }
                 });
             }

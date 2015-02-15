@@ -1,5 +1,7 @@
 package com.infinitemoments.moments;
 
+import com.facebook.Response;
+
 import retrofit.Callback;
 import retrofit.http.Body;
 import retrofit.http.Field;
@@ -15,6 +17,7 @@ public interface HeisenbergProxy {
     @FormUrlEncoded
     @POST("/users")
     void postUser(@Field("email") String email,
+                  @Field("username") String username,
                   @Field("password") String password,
                   @Field("name") String name,
                   Callback<User> cb);
