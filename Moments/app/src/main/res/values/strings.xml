@@ -5,5 +5,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="facebook_app_id">845110215545595</string>
+    <string name="title_facebook_login">Facebook Login</string>
 
 </resources>

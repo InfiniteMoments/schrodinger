@@ -1,7 +1,7 @@
 package com.infinitemoments.moments;
 
 import android.app.Activity;
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +22,7 @@ public class StarterFragment extends Fragment {
     @InjectView(R.id.btnLogin)
     Button loginButton;
 
-    ILoginSignup mCallback;
+    LoginSignupListener mCallback;
 
     /**
      * @return A new instance of fragment StarterFragment.
@@ -57,10 +57,10 @@ public class StarterFragment extends Fragment {
         // This makes sure that the container activity has implemented
         // the callback interface. If not, it throws an exception
         try {
-            mCallback = (ILoginSignup) activity;
+            mCallback = (LoginSignupListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement ILoginSignup");
+                    + " must implement LoginSignupListener");
         }
     }
 
