@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import io.realm.Realm;
+import io.realm.RealmQuery;
 
 public class MainActivity extends ActionBarActivity implements LoginSignupListener {
     private Realm realm;
@@ -67,7 +68,12 @@ public class MainActivity extends ActionBarActivity implements LoginSignupListen
         // Open the default realm ones for the UI thread.
         realm = Realm.getInstance(this);
 
-        UserObject loggedInUser = realm.where(UserObject.class).findFirst();
+        // Build the query looking at all users:
+        RealmQuery<UserObject> query = realm.where(UserObject.class);
+
+        // Add query conditions:
+        query.equalTo("id", user.id);
+        UserObject loggedInUser = query.findFirst();
 
         if (loggedInUser == null){
             // All writes must be wrapped in a transaction to facilitate safe multi threading

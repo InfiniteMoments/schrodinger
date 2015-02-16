@@ -19,6 +19,7 @@ import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
 import com.facebook.model.GraphUser;
 import com.facebook.widget.LoginButton;
+import com.squareup.okhttp.OkHttpClient;
 
 import java.util.Arrays;
 
@@ -29,6 +30,7 @@ import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.android.AndroidLog;
+import retrofit.client.OkClient;
 import retrofit.mime.TypedByteArray;
 
 public class SignupFragment extends Fragment {
@@ -77,6 +79,7 @@ public class SignupFragment extends Fragment {
                 .setEndpoint(Constants.API_URL)
                 .setLogLevel(RestAdapter.LogLevel.FULL)
                 .setLog(new AndroidLog("xx--LOG--xx"))
+                .setClient(new OkClient(new OkHttpClient()))
                 .build();
         proxy = restAdapter.create(HeisenbergProxy.class);
     }

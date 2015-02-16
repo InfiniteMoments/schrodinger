@@ -7,7 +7,11 @@ import retrofit.http.Body;
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
+import retrofit.http.Header;
+import retrofit.http.Headers;
+import retrofit.http.Multipart;
 import retrofit.http.POST;
+import retrofit.http.Part;
 import retrofit.http.Path;
 
 /**
@@ -21,4 +25,10 @@ public interface HeisenbergProxy {
                   @Field("password") String password,
                   @Field("name") String name,
                   Callback<User> cb);
+
+    @FormUrlEncoded
+    @POST("/login")
+    void postLogin(@Field("username") String username,
+                   @Field("password") String password,
+                   Callback<Response> cb);
 }
