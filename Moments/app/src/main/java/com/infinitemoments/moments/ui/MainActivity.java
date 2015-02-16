@@ -1,10 +1,15 @@
-package com.infinitemoments.moments;
+package com.infinitemoments.moments.ui;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.infinitemoments.moments.listeners.LoginSignupListener;
+import com.infinitemoments.moments.R;
+import com.infinitemoments.moments.objects.User;
+import com.infinitemoments.moments.models.UserObject;
 
 import io.realm.Realm;
 import io.realm.RealmQuery;

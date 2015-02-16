@@ -1,6 +1,6 @@
-package com.infinitemoments.moments;
+package com.infinitemoments.moments.listeners;
 
-import io.realm.Realm;
+import com.infinitemoments.moments.objects.User;
 
 /**
  * Created by Salman on 2/13/2015.

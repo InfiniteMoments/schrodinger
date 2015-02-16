@@ -1,4 +1,4 @@
-package com.infinitemoments.moments;
+package com.infinitemoments.moments.ui;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -10,8 +10,12 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.facebook.Response;
-import com.squareup.okhttp.OkHttpClient;
+import com.infinitemoments.moments.Constants;
+import com.infinitemoments.moments.objects.Credentials;
+import com.infinitemoments.moments.proxies.HeisenbergProxy;
+import com.infinitemoments.moments.listeners.LoginSignupListener;
+import com.infinitemoments.moments.R;
+import com.infinitemoments.moments.objects.User;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -20,7 +24,6 @@ import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.android.AndroidLog;
-import retrofit.client.OkClient;
 import retrofit.mime.TypedByteArray;
 
 public class LoginFragment extends Fragment {
@@ -80,15 +83,20 @@ public class LoginFragment extends Fragment {
             return;
         }
 
-        proxy.postLogin(username.getText().toString(), password.getText().toString(), new Callback<Response>() {
+        Credentials cred = new Credentials();
+        cred.username = username.getText().toString();
+        cred.password = password.getText().toString();
+
+        proxy.postLogin(cred, new Callback<User>() {
             @Override
-            public void success(Response response, retrofit.client.Response response2) {
+            public void success(User response, retrofit.client.Response response2) {
                 Log.v(TAG, "Sign up successful!");
-                Log.v(TAG, "Raw response: " + response.toString());
+                Log.v(TAG, "Raw response: " + response.token.toString());
             }
 
             @Override
             public void failure(RetrofitError error) {
+                Log.v(TAG, error.getMessage());
                 final String json =  new String(((TypedByteArray)error.getResponse().getBody()).getBytes());
                 Log.v("failure", json.toString());
                 getActivity().runOnUiThread(new Runnable() {

@@ -1,4 +1,4 @@
-package com.infinitemoments.moments;
+package com.infinitemoments.moments.ui;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -19,6 +19,11 @@ import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
 import com.facebook.model.GraphUser;
 import com.facebook.widget.LoginButton;
+import com.infinitemoments.moments.Constants;
+import com.infinitemoments.moments.proxies.HeisenbergProxy;
+import com.infinitemoments.moments.listeners.LoginSignupListener;
+import com.infinitemoments.moments.R;
+import com.infinitemoments.moments.objects.User;
 import com.squareup.okhttp.OkHttpClient;
 
 import java.util.Arrays;
@@ -139,8 +144,9 @@ public class SignupFragment extends Fragment {
             user.email = email.getText().toString();
             user.name = facebookUser.getName();
             user.username = username.getText().toString();
+            user.password = password.getText().toString();
 
-            postUserToServer(user, password.getText().toString());
+            postUserToServer(user);
         } else {
             // Passwords don't match
             Toast.makeText(this.getActivity(), "Passwords don't match, enter again!", Toast.LENGTH_SHORT).show();
@@ -151,8 +157,8 @@ public class SignupFragment extends Fragment {
 
     }
 
-    private void postUserToServer(User user, String password){
-        proxy.postUser(user.email, user.username, password, user.name, new Callback<User>() {
+    private void postUserToServer(User user){
+        proxy.postUser(user, new Callback<User>() {
             @Override
             public void success(User user, retrofit.client.Response response) {
                 Log.v(TAG, "Sign up successful!");

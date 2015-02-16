@@ -1,4 +1,4 @@
-package com.infinitemoments.moments;
+package com.infinitemoments.moments.models;
 
 import com.google.gson.annotations.SerializedName;
 

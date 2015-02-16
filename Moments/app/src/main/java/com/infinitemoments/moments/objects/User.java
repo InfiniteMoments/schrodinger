@@ -1,4 +1,4 @@
-package com.infinitemoments.moments;
+package com.infinitemoments.moments.objects;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -18,4 +18,6 @@ public class User {
     public String username;
     @SerializedName("token")
     public String token;
+    @SerializedName("password")
+    public String password;
 }
