@@ -1,15 +1,15 @@
 package com.infinitemoments.moments.ui;
 
 import android.app.Activity;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.infinitemoments.moments.listeners.LoginSignupListener;
 import com.infinitemoments.moments.R;
+import com.infinitemoments.moments.listeners.LoginSignupListener;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -18,7 +18,7 @@ import butterknife.OnClick;
 /**
  * This fragment leads the user to login and sign up fragments
  */
-public class StarterFragment extends Fragment {
+public class MomentListFragment extends Fragment {
     @InjectView(R.id.btnSignUp)
     Button signUpButton;
 
@@ -30,12 +30,12 @@ public class StarterFragment extends Fragment {
     /**
      * @return A new instance of fragment StarterFragment.
      */
-    public static StarterFragment newInstance() {
-        StarterFragment fragment = new StarterFragment();
+    public static MomentListFragment newInstance() {
+        MomentListFragment fragment = new MomentListFragment();
         return fragment;
     }
 
-    public StarterFragment() {
+    public MomentListFragment() {
         // Required empty public constructor
     }
 

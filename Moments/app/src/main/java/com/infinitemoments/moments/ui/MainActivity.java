@@ -1,21 +1,28 @@
 package com.infinitemoments.moments.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 
+import com.infinitemoments.moments.events.HideProgressBarEvent;
+import com.infinitemoments.moments.events.ValidLoginEvent;
 import com.infinitemoments.moments.listeners.LoginSignupListener;
 import com.infinitemoments.moments.R;
 import com.infinitemoments.moments.objects.User;
 import com.infinitemoments.moments.models.UserObject;
 
+import de.greenrobot.event.EventBus;
 import io.realm.Realm;
 import io.realm.RealmQuery;
 
 public class MainActivity extends ActionBarActivity implements LoginSignupListener {
     private Realm realm;
+    private String connectedUsername;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +84,7 @@ public class MainActivity extends ActionBarActivity implements LoginSignupListen
         RealmQuery<UserObject> query = realm.where(UserObject.class);
 
         // Add query conditions:
-        query.equalTo("id", user.id);
+        query.equalTo("username", user.username);
         UserObject loggedInUser = query.findFirst();
 
         if (loggedInUser == null){
@@ -86,24 +93,63 @@ public class MainActivity extends ActionBarActivity implements LoginSignupListen
 
             // No existing users stored, create new object
             UserObject storedUser = realm.createObject(UserObject.class);
-            storedUser.setId(user.id);
-            storedUser.setName(user.name);
-            storedUser.setEmail(user.email);
-            storedUser.setToken(user.token);
+            if (user.id != null) {
+                storedUser.setId(user.id);
+            }
+
+            if (user.name != null) {
+                storedUser.setName(user.name);
+            }
+
+            if (user.email != null) {
+                storedUser.setEmail(user.email);
+            }
+
+            if (user.token != null) {
+                storedUser.setToken(user.token);
+            }
+
+            if (user.username != null) {
+                storedUser.setUsername(user.username);
+                connectedUsername = user.username;
+            }
+
             realm.commitTransaction();
         } else {
             // Found an existing user object, update it
             realm.beginTransaction();
-            loggedInUser.setId(user.id);
-            loggedInUser.setName(user.name);
-            loggedInUser.setEmail(user.email);
+            connectedUsername = user.username;
             loggedInUser.setToken(user.token);
+
             realm.commitTransaction();
         }
+
+        //Update UI
+        EventBus.getDefault().post(new HideProgressBarEvent());
     }
 
     @Override
     public void updateActionBarTitle(String title) {
         this.getSupportActionBar().setTitle(title);
+    }
+
+    public void onEvent(ValidLoginEvent event){
+        //Login is valid, transition to next activity
+        Intent i = new Intent(this, MomentActivity.class);
+        i.putExtra("username", connectedUsername);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(i);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 }

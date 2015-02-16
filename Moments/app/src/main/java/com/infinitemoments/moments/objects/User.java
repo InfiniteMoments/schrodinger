@@ -1,6 +1,7 @@
 package com.infinitemoments.moments.objects;
 
 import com.google.gson.annotations.SerializedName;
+import com.infinitemoments.moments.models.UserObject;
 
 import io.realm.RealmObject;
 
@@ -20,4 +21,16 @@ public class User {
     public String token;
     @SerializedName("password")
     public String password;
+
+    public User(){
+
+    }
+
+    public User(UserObject uo){
+        id = uo.getId();
+        email = uo.getEmail();
+        name = uo.getName();
+        username=uo.getUsername();
+        token = uo.getToken();
+    }
 }

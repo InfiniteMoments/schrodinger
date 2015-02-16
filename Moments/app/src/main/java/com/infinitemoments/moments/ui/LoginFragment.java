@@ -7,10 +7,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.infinitemoments.moments.Constants;
+import com.infinitemoments.moments.events.HideProgressBarEvent;
+import com.infinitemoments.moments.events.ValidLoginEvent;
 import com.infinitemoments.moments.objects.Credentials;
 import com.infinitemoments.moments.proxies.HeisenbergProxy;
 import com.infinitemoments.moments.listeners.LoginSignupListener;
@@ -20,6 +24,7 @@ import com.infinitemoments.moments.objects.User;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import de.greenrobot.event.EventBus;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
@@ -29,9 +34,12 @@ import retrofit.mime.TypedByteArray;
 public class LoginFragment extends Fragment {
     @InjectView(R.id.edtUsername)
     EditText username;
-
     @InjectView(R.id.edtPassword)
     EditText password;
+    @InjectView(R.id.btnLogin)
+    Button login;
+    @InjectView(R.id.prgLoading)
+    ProgressBar loadingBar;
 
     private LoginSignupListener mCallback;
     private RestAdapter restAdapter;
@@ -83,7 +91,11 @@ public class LoginFragment extends Fragment {
             return;
         }
 
-        Credentials cred = new Credentials();
+        //Show loading bar
+        loadingBar.setVisibility(View.VISIBLE);
+        login.setEnabled(false);
+
+        final Credentials cred = new Credentials();
         cred.username = username.getText().toString();
         cred.password = password.getText().toString();
 
@@ -92,6 +104,8 @@ public class LoginFragment extends Fragment {
             public void success(User response, retrofit.client.Response response2) {
                 Log.v(TAG, "Sign up successful!");
                 Log.v(TAG, "Raw response: " + response.token.toString());
+                response.username = cred.username;
+                mCallback.storeLoggedInUser(response);
             }
 
             @Override
@@ -124,5 +138,24 @@ public class LoginFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mCallback = null;
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+    public void onEventMainThread(HideProgressBarEvent event){
+        login.setEnabled(true);
+        loadingBar.setVisibility(View.GONE);
+
+        EventBus.getDefault().post(new ValidLoginEvent());
     }
 }

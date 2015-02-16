@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.facebook.Request;
@@ -20,6 +21,8 @@ import com.facebook.UiLifecycleHelper;
 import com.facebook.model.GraphUser;
 import com.facebook.widget.LoginButton;
 import com.infinitemoments.moments.Constants;
+import com.infinitemoments.moments.events.HideProgressBarEvent;
+import com.infinitemoments.moments.events.ValidLoginEvent;
 import com.infinitemoments.moments.proxies.HeisenbergProxy;
 import com.infinitemoments.moments.listeners.LoginSignupListener;
 import com.infinitemoments.moments.R;
@@ -31,6 +34,7 @@ import java.util.Arrays;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import de.greenrobot.event.EventBus;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
@@ -51,6 +55,8 @@ public class SignupFragment extends Fragment {
     Button signUp;
     @InjectView(R.id.authButton)
     LoginButton authButton;
+    @InjectView(R.id.prgLoading)
+    ProgressBar loadingBar;
 
     private LoginSignupListener mCallback;
     private UiLifecycleHelper uiHelper;
@@ -139,6 +145,10 @@ public class SignupFragment extends Fragment {
         }
 
         if (password.getText().toString().equals(verifyPassword.getText().toString())){
+            //Show loading bar
+            loadingBar.setVisibility(View.VISIBLE);
+            signUp.setEnabled(false);
+
             // Proceed to complete sign up
             User user = new User();
             user.email = email.getText().toString();
@@ -165,6 +175,7 @@ public class SignupFragment extends Fragment {
                 Log.v(TAG, "Raw response: " + response.toString());
 
                 // Save the User object locally and login
+                mCallback.storeLoggedInUser(user);
             }
 
             @Override
@@ -246,5 +257,24 @@ public class SignupFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         uiHelper.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+    public void onEventMainThread(HideProgressBarEvent event){
+        signUp.setEnabled(true);
+        loadingBar.setVisibility(View.GONE);
+
+        EventBus.getDefault().post(new ValidLoginEvent());
     }
 }
