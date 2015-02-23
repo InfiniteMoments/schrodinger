@@ -1,5 +1,8 @@
 package com.infinitemoments.moments.ui;
 
+import android.app.Activity;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.PagerTitleStrip;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -13,13 +16,23 @@ import android.os.Build;
 import android.widget.Toast;
 
 import com.infinitemoments.moments.R;
+import com.infinitemoments.moments.adapters.HomeFragmentsAdapter;
 import com.infinitemoments.moments.models.UserObject;
 import com.infinitemoments.moments.objects.User;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 import io.realm.Realm;
 import io.realm.RealmQuery;
 
-public class MomentActivity extends ActionBarActivity {
+public class MomentActivity extends FragmentActivity {
+    @InjectView(R.id.viewHolderTitle)
+    PagerTitleStrip pageTitle;
+
+    private HomeFragmentsAdapter pageAdapter;
     private Realm realm;
     private User connectedUser;
 
@@ -27,15 +40,20 @@ public class MomentActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_moment);
+        ButterKnife.inject(this);
+
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new PlaceholderFragment())
+                    .add(R.id.container, MomentListFragment.newInstance())
                     .commit();
         }
 
         getCurrentUserDetails(getIntent().getStringExtra("username"));
 
         Toast.makeText(this, connectedUser.username + " has logged in with token " + connectedUser.token, Toast.LENGTH_SHORT).show();
+
+        List<Fragment> fragments = getFragments();
+        pageAdapter = new HomeFragmentsAdapter(getSupportFragmentManager(), fragments);
     }
 
 
@@ -75,19 +93,9 @@ public class MomentActivity extends ActionBarActivity {
         connectedUser = new User(loggedInUser);
     }
 
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-
-        public PlaceholderFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_moment, container, false);
-            return rootView;
-        }
+    private List<Fragment> getFragments() {
+        List<Fragment> fList = new ArrayList<Fragment>();
+        fList.add(MomentListFragment.newInstance());
+        return fList;
     }
 }
