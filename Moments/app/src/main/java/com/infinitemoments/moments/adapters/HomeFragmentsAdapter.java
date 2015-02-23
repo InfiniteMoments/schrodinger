@@ -34,6 +34,10 @@ public class HomeFragmentsAdapter extends FragmentPagerAdapter {
         switch (position) {
             case 0:
                 return "MOMENTS";
+            case 1:
+                return "FEED";
+            case 2:
+                return "PROFILE";
         }
         return null;
     }

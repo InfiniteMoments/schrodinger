@@ -96,6 +96,8 @@ public class MomentActivity extends FragmentActivity {
     private List<Fragment> getFragments() {
         List<Fragment> fList = new ArrayList<Fragment>();
         fList.add(MomentListFragment.newInstance());
+        fList.add(FeedListFragment.newInstance());
+        fList.add(ProfileFragment.newInstance());
         return fList;
     }
 }
